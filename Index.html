@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="학교 내 미세먼지 실시간 측정 및 개선 프로젝트">
+  <meta property="og:title" content="Eco Christmas - 깨끗한 학교 공기 프로젝트 🎄">
+  <meta property="og:description" content="크리스마스 분위기 속에서 미세먼지 데이터를 시각화하고, 깨끗한 공기를 위한 캠페인을 함께 해요.">
+  <meta property="og:type" content="website">
+  <title>Eco Christmas 🎄</title>
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {
+      height:100vh;
+      overflow:hidden;
+      background:linear-gradient(to bottom, #002b36, #004b63);
+      color:white;
+      font-family:'Pretendard', sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    h1 {
+      font-size:2.5em;
+      text-shadow:0 0 15px #fff;
+      margin-bottom:10px;
+    }
+    p { font-size:1.1em; opacity:0.9; margin-bottom:20px; }
+
+    #dataBox {
+      background:rgba(255,255,255,0.1);
+      border-radius:10px;
+      padding:20px 30px;
+      text-align:center;
+      box-shadow:0 0 10px rgba(255,255,255,0.2);
+    }
+
+    button {
+      background:#ff4757;
+      border:none;
+      padding:12px 25px;
+      border-radius:8px;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+      margin-top:15px;
+    }
+    button:hover {
+      background:#ffa502;
+      transform:scale(1.05);
+    }
+
+    canvas {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+    }
+    footer {
+      position:absolute;
+      bottom:10px;
+      font-size:0.9em;
+      opacity:0.8;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="snow"></canvas>
+  <h1>🎄 Eco Christmas 🎄</h1>
+  <p>학교 내 미세먼지 실시간 측정 및 개선 캠페인</p>
+
+  <div id="dataBox">
+    <h2>현재 교실 미세먼지 수치: <span id="dust">--</span> ㎍/㎥</h2>
+    <p id="comment">데이터를 불러오는 중...</p>
+    <button id="refresh">새로고침</button>
+  </div>
+
+  <footer>Made with 💚 by Ham’s Eco Lab</footer>
+
+  <script>
+    // 눈 효과
+    const canvas = document.getElementById('snow');
+    const ctx = canvas.getContext('2d');
+    let snowflakes = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createSnowflake() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 3 + 1,
+        speedY: Math.random() * 2 + 1,
+        alpha: Math.random()
+      };
+    }
+    for (let i=0; i<150; i++) snowflakes.push(createSnowflake());
+
+    function drawSnowflakes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      snowflakes.forEach(flake => {
+        ctx.globalAlpha = flake.alpha;
+        ctx.moveTo(flake.x, flake.y);
+        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+      });
+      ctx.fill();
+      updateSnowflakes();
+    }
+
+    function updateSnowflakes() {
+      snowflakes.forEach(flake => {
+        flake.y += flake.speedY;
+        if (flake.y > canvas.height) {
+          flake.x = Math.random() * canvas.width;
+          flake.y = 0;
+        }
+      });
+      requestAnimationFrame(drawSnowflakes);
+    }
+    drawSnowflakes();
+
+    // 가짜 미세먼지 데이터 (시뮬레이션)
+    const dust = document.getElementById('dust');
+    const comment = document.getElementById('comment');
+    const refresh = document.getElementById('refresh');
+
+    function getDustLevel() {
+      const value = Math.floor(Math.random() * 80 + 10);
+      dust.textContent = value;
+      if (value < 30) {
+        comment.textContent = "💚 깨끗한 공기! 산책하기 좋은 날이에요!";
+      } else if (value < 60) {
+        comment.textContent = "😷 보통 수준, 환기 자주 해주세요.";
+      } else {
+        comment.textContent = "🚨 나쁨! 마스크 착용하고 창문 닫기!";
+      }
+    }
+
+    getDustLevel();
+    refresh.addEventListener('click', getDustLevel);
+  </script>
+</body>
+</html>
